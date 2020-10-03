@@ -1,1 +1,2 @@
 # FellowScholars
+Dír feló szkálörz
