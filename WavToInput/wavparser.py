@@ -3,114 +3,55 @@ import librosa
 import matplotlib.pyplot as plt
 import numpy as np
 
-PATH1='res/noisy_testset_wav'
-files1=os.listdir(PATH1)
-PATH2='res/clean_testset_wav'
-files2=os.listdir(PATH2)
 
-def print_len_of_speech(maxidx=30):
-    noisys=[]
-    for idx, file in enumerate(files1):
-        if idx < maxidx:
-            y, sr = librosa.load(PATH1 + '/' + file)
-            noisys.append(y)
-
-    for i in noisys:
-        print(len(i))
-
-def load_data(path, n=None, max_len=None):
-    files=os.listdir(path)
-    if (n == None):
-        nb_sample = len(files)
+def load_data(path, max_file_count=None, max_sample_count=None):
+    files = os.listdir(path)
+    if max_file_count is None:
+        max_file_count = len(files)
+    if max_sample_count is None:
+        data = np.empty((max_file_count,), dtype=np.ndarray)
     else:
-        nb_sample = n
-    if max_len == None:
-        data=np.empty((nb_sample,),dtype=np.ndarray)
-    else:
-        data = np.zeros((nb_sample,max_len))
+        data = np.zeros((max_file_count, max_sample_count))
         print(data)
-    for idx, file in enumerate(files):
-        if idx >= nb_sample:
+    for i, file in enumerate(files):
+        if i >= max_file_count:
             break
-        y, sr = librosa.load(path + '/' + file)
-        if max_len == None:
-            data[idx] = y
+        samples, sample_rate = librosa.load(os.path.join(path, file))
+        if max_sample_count is None:
+            data[i] = samples
         else:
-            data[idx,0:len(y)] = y
+            data[i, 0:len(samples)] = samples
     return data
 
 
-def find_closest_speech_lengths(how_many, maxidx = None):
-    if maxidx is None:
-        noisys = [[0]] * len(files1)
-    else:
-        noisys = [[0]] * maxidx
+noisy_trainset_directory = "datasets/DS_10283_2791/noisy_trainset_28spk_wav"
+clean_trainset_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
 
-    lens=[0] * len(noisys)
-    #read all noisy speech
-    for idx, file in enumerate(files1):
-        if maxidx is not None:
-            if idx < maxidx:
-                y, sr = librosa.load(PATH1 + '/' + file)
-                noisys[idx] = y
-                lens[idx] = len(y)
+
+def find_closest_speech_lengths(target_count, max_file_count=None):
+    noisy_files = []
+    for i, filename in enumerate(os.listdir(noisy_trainset_directory)):
+        if (max_file_count is not None) and i < max_file_count:
+            duration = librosa.get_duration(filename=os.path.join(noisy_trainset_directory, filename))
+            noisy_files.append((filename, duration))
         else:
-            y, sr = librosa.load(PATH1 + '/' + file)
-            noisys[idx] = y
-            lens[idx] = len(y)
+            break
+    noisy_files.sort(key=lambda x: x[1])
+    print(noisy_files)
+    
+    # Find the subset of target count with minimum duration difference.
+    min_i = np.argmin([noisy_files[i + target_count][1] - noisy_files[i][1]
+                       for i in range(len(noisy_files) - target_count)])
+    target_noisy_files = noisy_files[min_i: min_i + target_count]
 
-    #sort the lengths array
-    lens.sort()
-
-    #find the n speech closest to each other
-    minlendiff=9999999999
-    minlenidx=0
-    for i in range(len(lens)-how_many):
-        songlendiff=lens[i+how_many]-lens[i]
-        if songlendiff<minlendiff:
-            minlendiff=songlendiff
-            minlenidx=i
-
-    #put the good lengths into an array
-    goodlens=[0] * how_many
-    idx=0
-    for i in range(minlenidx, minlenidx+how_many):
-        goodlens[idx]=lens[i]
-        idx+=1
-
-    #put the speechs with the good lengths into an array
-    goodlenspeech=[[0]] * how_many
-    idx=0
-    for i in noisys:
-        if goodlens.__contains__(len(i)):
-            goodlenspeech[idx]=i
-            idx+=1
-
-    #parse the clean speeches with good lengths
-    cleans=[[0]] * how_many
-    idx=0
-    for i, file in enumerate(files2):
-        if maxidx is not None:
-            if i < maxidx:
-                y, sr = librosa.load(PATH2 + '/' + file)
-                if goodlens.__contains__(len(y)):
-                    cleans[idx] = y
-                    idx += 1
-        else:
-            y, sr = librosa.load(PATH2 + '/' + file)
-            if goodlens.__contains__(len(y)):
-                cleans[idx] = y
-                idx += 1
-
-    #point the pointer to the right direction
-    noisys=goodlenspeech
-
-    for i in noisys:
-        plt.plot(i)
+    for filename, duration in target_noisy_files:
+        noisy_samples, _ = librosa.load(os.path.join(noisy_trainset_directory, filename))
+        clean_samples, _ = librosa.load(os.path.join(clean_trainset_directory, filename))
+        plt.plot(noisy_samples)
+        plt.figtext(0.5, 0.01, "noisy " + filename)
         plt.show()
-
-    for i in cleans:
-        plt.plot(i)
+        plt.plot(clean_samples)
+        plt.figtext(0.5, 0.01, "clean " + filename)
         plt.show()
 
 
