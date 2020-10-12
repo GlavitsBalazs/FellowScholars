@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+noisy_trainset_directory = "datasets/DS_10283_2791/noisy_trainset_28spk_wav"
+clean_trainset_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
+
+
 def load_data(path, max_file_count=None, max_sample_count=None):
     files = os.listdir(path)
     if max_file_count is None:
@@ -24,12 +28,45 @@ def load_data(path, max_file_count=None, max_sample_count=None):
     return data
 
 
-noisy_trainset_directory = "datasets/DS_10283_2791/noisy_trainset_28spk_wav"
-clean_trainset_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
+def visualize(noisy, clean, n=None):
+    if len(noisy) != len(clean):
+        return
+    if n is None:
+        n = len(noisy)
+    if n > len(noisy):
+        n = len(noisy)
+    for i in range(n):
+        plt.plot(noisy[i])
+        plt.figtext(0.5, 0.01, "noisy {}".format(i))
+        plt.show()
+        plt.plot(clean[i])
+        plt.figtext(0.5, 0.01, "clean {}".format(i))
+        plt.show()
 
 
-def find_closest_speech_lengths(target_count, max_file_count=None):
+def zero_pad(noisy, clean):
+    ret_noisy = np.copy(noisy)
+    ret_clean = np.copy(clean)
+    if len(noisy) != len(clean):
+        return
+    max_n = 0
+    for i in noisy:
+        if len(i) > max_n:
+            max_n = len(i)
+    for i in range(len(noisy)):
+        pad = max_n - len(ret_noisy[i])
+        if pad > 0:
+            ret_noisy[i] = np.pad(ret_noisy[i], (0,pad), 'constant')
+            ret_clean[i] = np.pad(ret_clean[i], (0,pad), 'constant')
+
+    return ret_noisy, ret_clean
+
+
+def find_closest_speech_lengths(target_count, max_file_count=None, visualize=False):
     noisy_files = []
+    if max_file_count is None:
+        files=os.listdir(noisy_trainset_directory)
+        max_file_count = len(files)
     for i, filename in enumerate(os.listdir(noisy_trainset_directory)):
         if (max_file_count is not None) and i < max_file_count:
             duration = librosa.get_duration(filename=os.path.join(noisy_trainset_directory, filename))
@@ -43,16 +80,18 @@ def find_closest_speech_lengths(target_count, max_file_count=None):
     min_i = np.argmin([noisy_files[i + target_count][1] - noisy_files[i][1]
                        for i in range(len(noisy_files) - target_count)])
     target_noisy_files = noisy_files[min_i: min_i + target_count]
-
+    noisy_samples=np.empty((target_count,), dtype=np.ndarray)
+    clean_samples=np.empty((target_count,), dtype=np.ndarray)
+    i = 0
     for filename, duration in target_noisy_files:
-        noisy_samples, _ = librosa.load(os.path.join(noisy_trainset_directory, filename))
-        clean_samples, _ = librosa.load(os.path.join(clean_trainset_directory, filename))
-        plt.plot(noisy_samples)
-        plt.figtext(0.5, 0.01, "noisy " + filename)
-        plt.show()
-        plt.plot(clean_samples)
-        plt.figtext(0.5, 0.01, "clean " + filename)
-        plt.show()
+            noisy_samples[i], _ = librosa.load(os.path.join(noisy_trainset_directory, filename))
+            clean_samples[i], _ = librosa.load(os.path.join(clean_trainset_directory, filename))
+            i += 1
+    return noisy_samples, clean_samples
 
 
-find_closest_speech_lengths(7, 20)
+#noisy, clean = find_closest_speech_lengths(10000)
+noisy, clean = find_closest_speech_lengths(7, 20)
+noisy_padded, clean_padded = zero_pad(noisy, clean)
+visualize(noisy, clean, 10)
+visualize(noisy_padded, clean_padded, 10)
