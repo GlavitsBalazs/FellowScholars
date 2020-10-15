@@ -3,10 +3,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import wavfile
 
-clean_trainset_28spk_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
+'''clean_trainset_28spk_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
 noisy_trainset_28spk_directory = "datasets/DS_10283_2791/noisy_trainset_28spk_wav"
 clean_trainset_56spk_directory = "datasets/DS_10283_2791/clean_trainset_56spk_wav"
-noisy_trainset_56spk_directory = "datasets/DS_10283_2791/noisy_trainset_56spk_wav"
+noisy_trainset_56spk_directory = "datasets/DS_10283_2791/noisy_trainset_56spk_wav"'''
+
+clean_trainset_28spk_directory = "res/clean_testset_wav"
+noisy_trainset_28spk_directory = "res/noisy_testset_wav"
+clean_trainset_56spk_directory = "res/clean_testset_wav"
+noisy_trainset_56spk_directory = "res/noisy_testset_wav"
+
+
+clean_testset = "res/clean_testset_wav"
+noisy_testset = "res/noisy_testset_wav"
+
 
 
 def get_speech_duration(path):
@@ -113,12 +123,62 @@ def find_closest_speech_lengths(target_count, max_file_count=None, visualize=Fal
         _, noisy_samples[i] = wavfile.read(os.path.join(noisy_trainset_28spk_directory, filename))
         _, clean_samples[i] = wavfile.read(os.path.join(clean_trainset_28spk_directory, filename))
         i += 1
-    return noisy_samples, clean_samples
+    return noisy_samples, clean_samples, target_noisy_files[0][1], target_noisy_files[len(target_noisy_files)-1][1]
 
+
+def read_test_files(min_duration, max_duration):
+    noisy_test=[]
+    clean_test=[]
+    for filename in os.listdir(noisy_testset):
+        dur = get_speech_duration(os.path.join(noisy_testset, filename))
+        if min_duration <= dur <= max_duration:
+            noisy_test.append(wavfile.read(os.path.join(noisy_testset, filename)))
+    for filename in os.listdir(clean_testset):
+        dur = get_speech_duration(os.path.join(clean_testset, filename))
+        if min_duration <= dur <= max_duration:
+            clean_test.append(wavfile.read(os.path.join(clean_testset, filename)))
+
+    return  noisy_test, clean_test
+
+
+def train_val_split(noisy, clean):
+    lenconst=noisy.shape[0]
+    randperm = np.random.permutation(lenconst)
+    noisy, clean = noisy[randperm, :], clean[randperm, :]
+    noisy_train, clean_train, noisy_val, clean_val = noisy[:int(np.round(0.8*lenconst)), :], clean[:int(np.round(0.8*lenconst)), :], noisy[int(np.round(0.8*lenconst)):, :], clean[int(np.round(0.8*lenconst)):, :]
+    return noisy_train, clean_train, noisy_val, clean_val
+
+
+def make_np_array(array):
+    array = np.asarray(array)
+    array = np.vstack([i for i in array])
+    return array
 
 # noisy, clean = find_closest_speech_lengths(10000)
 # noisy, clean = find_closest_speech_lengths(7, 20)
 # noisy_padded, clean_padded = zero_pad(noisy, clean)
 # visualize(noisy, clean, 10)
 # visualize(noisy_padded, clean_padded, 10)
-plot_durations_histogram()
+#plot_durations_histogram()
+
+'''noisy, clean , mindur, maxdur= find_closest_speech_lengths(50)
+noisy_test, clean_test = read_test_files(mindur, maxdur)
+
+noisy_padded, clean_padded = zero_pad(noisy, clean)
+noisy_test_padded, clean_test_padded = zero_pad(noisy_test, clean_test)
+
+noisy_padded=make_np_array(noisy_padded)
+noisy_test_padded=make_np_array(noisy_test_padded)
+clean_padded=make_np_array(clean_padded)
+clean_test_padded=make_np_array(clean_test_padded)
+
+noisy_train, clean_train, noisy_val, clean_val = train_val_split(noisy_padded, clean_padded)
+print(noisy_train.shape, noisy_val.shape)'''
+
+#noisy_padded = np.reshape(noisy_padded, (len(noisy_padded), len(noisy_padded[0])))
+#clean_padded = np.reshape(clean_padded, (len(noisy_padded), len(noisy_padded[0])))
+
+#noisy_padded = np.reshape(noisy_padded, (len(noisy_padded), len(noisy_padded[0])))
+
+
+#visualize(noisy_padded, clean_padded, 10)
