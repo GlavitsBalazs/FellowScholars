@@ -3,16 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import wavfile
 
-'''clean_trainset_28spk_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
+clean_trainset_28spk_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
 noisy_trainset_28spk_directory = "datasets/DS_10283_2791/noisy_trainset_28spk_wav"
 clean_trainset_56spk_directory = "datasets/DS_10283_2791/clean_trainset_56spk_wav"
-noisy_trainset_56spk_directory = "datasets/DS_10283_2791/noisy_trainset_56spk_wav"'''
-
-clean_trainset_28spk_directory = "res/clean_testset_wav"
-noisy_trainset_28spk_directory = "res/noisy_testset_wav"
-clean_trainset_56spk_directory = "res/clean_testset_wav"
-noisy_trainset_56spk_directory = "res/noisy_testset_wav"
-
+noisy_trainset_56spk_directory = "datasets/DS_10283_2791/noisy_trainset_56spk_wav"
 
 clean_testset = "res/clean_testset_wav"
 noisy_testset = "res/noisy_testset_wav"
