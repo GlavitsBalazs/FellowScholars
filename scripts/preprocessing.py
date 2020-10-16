@@ -2,14 +2,18 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import wavfile
+from sklearn.model_selection import train_test_split
 
 clean_trainset_28spk_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
 noisy_trainset_28spk_directory = "datasets/DS_10283_2791/noisy_trainset_28spk_wav"
 clean_trainset_56spk_directory = "datasets/DS_10283_2791/clean_trainset_56spk_wav"
 noisy_trainset_56spk_directory = "datasets/DS_10283_2791/noisy_trainset_56spk_wav"
 
+
 clean_testset = "res/clean_testset_wav"
 noisy_testset = "res/noisy_testset_wav"
+
+save_path = "res/saves"
 
 
 
@@ -121,25 +125,33 @@ def find_closest_speech_lengths(target_count, max_file_count=None, visualize=Fal
 
 
 def read_test_files(min_duration, max_duration):
-    noisy_test=[]
-    clean_test=[]
+    target_len_files=0
     for filename in os.listdir(noisy_testset):
         dur = get_speech_duration(os.path.join(noisy_testset, filename))
         if min_duration <= dur <= max_duration:
-            noisy_test.append(wavfile.read(os.path.join(noisy_testset, filename)))
+            target_len_files+=1
+
+    noisy_test=np.empty((target_len_files,),dtype=np.ndarray)
+    clean_test=np.empty((target_len_files,),dtype=np.ndarray)
+
+    i = 0
+    for filename in os.listdir(noisy_testset):
+        dur = get_speech_duration(os.path.join(noisy_testset, filename))
+        if min_duration <= dur <= max_duration:
+            _, noisy_test[i] = (wavfile.read(os.path.join(noisy_testset, filename)))
+            i+=1
+    i = 0
     for filename in os.listdir(clean_testset):
         dur = get_speech_duration(os.path.join(clean_testset, filename))
         if min_duration <= dur <= max_duration:
-            clean_test.append(wavfile.read(os.path.join(clean_testset, filename)))
+            _, clean_test[i] = (wavfile.read(os.path.join(clean_testset, filename)))
+            i+=1
 
     return  noisy_test, clean_test
 
 
 def train_val_split(noisy, clean):
-    lenconst=noisy.shape[0]
-    randperm = np.random.permutation(lenconst)
-    noisy, clean = noisy[randperm, :], clean[randperm, :]
-    noisy_train, clean_train, noisy_val, clean_val = noisy[:int(np.round(0.8*lenconst)), :], clean[:int(np.round(0.8*lenconst)), :], noisy[int(np.round(0.8*lenconst)):, :], clean[int(np.round(0.8*lenconst)):, :]
+    noisy_train, noisy_val, clean_train, clean_val = train_test_split(noisy, clean, test_size=0.2)
     return noisy_train, clean_train, noisy_val, clean_val
 
 
@@ -147,6 +159,40 @@ def make_np_array(array):
     array = np.asarray(array)
     array = np.vstack([i for i in array])
     return array
+
+def minmaxscale(noisy_train, clean_train, noisy_val, clean_val, noisy_test, clean_test):
+    max=0
+    for i in noisy_train:
+        if i.max() > max:
+            max=i.max()
+
+    noisy_train = noisy_train / max
+    clean_train = clean_train / max
+    noisy_val = noisy_val / max
+    clean_val = clean_val / max
+    noisy_test = noisy_test / max
+    clean_test = clean_test / max
+
+    return noisy_train, clean_train, noisy_val, clean_val, noisy_test, clean_test
+
+def save_correct_shapes(noisy_train, clean_train, noisy_val, clean_val, noisy_test, clean_test):
+    np.save(save_path + '/noisy_train.npy', np.expand_dims(noisy_train, axis=2))
+    np.save(save_path + '/clean_train.npy', np.expand_dims(clean_train, axis=2))
+    np.save(save_path + '/noisy_val.npy', np.expand_dims(noisy_val, axis=2))
+    np.save(save_path + '/clean_val.npy', np.expand_dims(clean_val, axis=2))
+    np.save(save_path + '/noisy_test.npy', np.expand_dims(noisy_test, axis=2))
+    np.save(save_path + '/clean_test.npy', np.expand_dims(clean_test, axis=2))
+
+
+def load_numpy_data():
+    noisy_train = np.load(save_path + '/noisy_train.npy')
+    clean_train = np.load(save_path + '/clean_train.npy')
+    noisy_val = np.load(save_path + '/noisy_val.npy')
+    clean_val = np.load(save_path + '/clean_val.npy')
+    noisy_test = np.load(save_path + '/noisy_test.npy')
+    clean_test = np.load(save_path + '/clean_test.npy')
+    return noisy_train, clean_train, noisy_val, clean_val, noisy_test, clean_test
+
 
 # noisy, clean = find_closest_speech_lengths(10000)
 # noisy, clean = find_closest_speech_lengths(7, 20)
@@ -166,8 +212,16 @@ noisy_test_padded=make_np_array(noisy_test_padded)
 clean_padded=make_np_array(clean_padded)
 clean_test_padded=make_np_array(clean_test_padded)
 
+
+
 noisy_train, clean_train, noisy_val, clean_val = train_val_split(noisy_padded, clean_padded)
-print(noisy_train.shape, noisy_val.shape)'''
+
+noisy_train, clean_train, noisy_val, clean_val, noisy_test, clean_test = minmaxscale(noisy_train, clean_train, noisy_val, clean_val, noisy_test_padded, clean_test_padded)
+
+print(noisy_train.shape, noisy_val.shape, noisy_test_padded.shape)
+
+save_correct_shapes(noisy_train, clean_train, noisy_val, clean_val, noisy_test_padded, clean_test_padded)'''
+
 
 #noisy_padded = np.reshape(noisy_padded, (len(noisy_padded), len(noisy_padded[0])))
 #clean_padded = np.reshape(clean_padded, (len(noisy_padded), len(noisy_padded[0])))
