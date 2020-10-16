@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import wavfile
 from sklearn.model_selection import train_test_split
+import librosa
 
 clean_trainset_28spk_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
 noisy_trainset_28spk_directory = "datasets/DS_10283_2791/noisy_trainset_28spk_wav"
@@ -193,6 +194,14 @@ def load_numpy_data():
     clean_test = np.load(save_path + '/clean_test.npy')
     return noisy_train, clean_train, noisy_val, clean_val, noisy_test, clean_test
 
+def mulaw_encode(samples):
+    # Rescale from -2**14..2**14 to -1.0..1.0. Encode to -128..127. Return 0..255.
+    return (librosa.mu_compress(samples / (2 ** 14), quantize=True) + 128).astype('uint8')
+
+
+def mulaw_decode(samples):
+    # Rescale from 0..255 to -128..127. Decode to -1.0..1.0. Return -2**14..2**14.
+    return (librosa.mu_expand(samples.astype('int16') - 128, quantize=True) * (2 ** 14)).astype('int16')
 
 # noisy, clean = find_closest_speech_lengths(10000)
 # noisy, clean = find_closest_speech_lengths(7, 20)
