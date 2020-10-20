@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import librosa
+import itertools
 from scipy.io import wavfile
 from sklearn.model_selection import train_test_split
 
@@ -21,17 +22,6 @@ class DataPoint:
         self.duration = self.sample_count / self.samples_per_second
         self.clean_audio = None
         self.noisy_audio = None
-
-    @staticmethod
-    def find_instances():
-        clean_trainset_28spk_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
-        noisy_trainset_28spk_directory = "datasets/DS_10283_2791/noisy_trainset_28spk_wav"
-        clean_trainset_56spk_directory = "datasets/DS_10283_2791/clean_trainset_56spk_wav"
-        noisy_trainset_56spk_directory = "datasets/DS_10283_2791/noisy_trainset_56spk_wav"
-        return [DataPoint(os.path.join(dirs[0], filename), os.path.join(dirs[1], filename))
-                for dirs in [(clean_trainset_28spk_directory, noisy_trainset_28spk_directory),
-                             (clean_trainset_56spk_directory, noisy_trainset_56spk_directory)]
-                for filename in os.listdir(dirs[0])]
 
     @staticmethod
     def mulaw_encode(samples):
@@ -55,11 +45,11 @@ class DataPoint:
 
 
 class Dataset:
-    def __init__(self, data_points):
-        train_data, test_data = train_test_split(data_points, test_size=0.2)
-        self.training = train_data
+    def __init__(self, train_data, test_data, validation_split=0.2):
+        training_data, validation_data = train_test_split(train_data, test_size=validation_split)
+        self.training = training_data
         self.testing = test_data
-        self.validation = data_points
+        self.validation = validation_data
 
     def export(self, directory):
         def export_clean_and_noisy(data_points, name):
@@ -124,17 +114,39 @@ def zero_pad(data_points):
             dp.noisy_audio = np.pad(dp.noisy_audio, (0, pad), 'constant')
 
 
+def load_training_data():
+    clean_trainset_28spk_directory = "datasets/DS_10283_2791/clean_trainset_28spk_wav"
+    noisy_trainset_28spk_directory = "datasets/DS_10283_2791/noisy_trainset_28spk_wav"
+    clean_trainset_56spk_directory = "datasets/DS_10283_2791/clean_trainset_56spk_wav"
+    noisy_trainset_56spk_directory = "datasets/DS_10283_2791/noisy_trainset_56spk_wav"
+    return [DataPoint(os.path.join(dirs[0], filename), os.path.join(dirs[1], filename))
+            for dirs in [(clean_trainset_28spk_directory, noisy_trainset_28spk_directory),
+                         (clean_trainset_56spk_directory, noisy_trainset_56spk_directory)]
+            for filename in os.listdir(dirs[0])]
+
+
+def load_test_data():
+    clean_testset_directory = "datasets/DS_10283_2791/clean_testset_wav"
+    noisy_testset_directory = "datasets/DS_10283_2791/noisy_testset_wav"
+    return [DataPoint(os.path.join(clean_testset_directory, filename),
+                      os.path.join(noisy_testset_directory, filename))
+            for filename in os.listdir(clean_testset_directory)]
+
+
 if __name__ == '__main__':
     print("Loading: 0%")
-    all_data_points = DataPoint.find_instances()
-    plot_durations_histogram(all_data_points)
-    closest_data = find_closest_speech_lengths(all_data_points, 1000)
+    training_data = load_training_data()
+    test_data = load_test_data()
+    closest_data = find_closest_speech_lengths(training_data, 1000)
+    plot_durations_histogram(training_data)
     plot_durations_histogram(closest_data)
-    for i, dp in enumerate(closest_data):
+    plot_durations_histogram(test_data)
+    for i, dp in enumerate(itertools.chain(closest_data, test_data)):
         dp.load_audio()
-        percentage = round(100 * (i + 1) / len(closest_data))
+        percentage = round(100 * (i + 1) / (len(closest_data) + len(test_data)))
         if i % 10 == 0:
             print("Loading: {}%".format(percentage))
     zero_pad(closest_data)
-    dataset = Dataset(closest_data)
+    zero_pad(test_data)  # Issue: the test data points will be longer than the train data points.
+    dataset = Dataset(closest_data, test_data)
     dataset.export('datasets/saves')
