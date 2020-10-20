@@ -1,5 +1,4 @@
 import os
-import matplotlib.pyplot as plt
 import numpy as np
 import librosa
 import itertools
@@ -36,6 +35,7 @@ class DataPoint:
 
     def load_audio(self):
         if self.clean_audio is None and self.noisy_audio is None:
+            # Use scipy.io.wavfile instead of librosa, because it supports integer samples.
             sr_clean, self.clean_audio = wavfile.read(self.clean_path)
             sr_noisy, self.noisy_audio = wavfile.read(self.noisy_path)
             assert len(self.noisy_audio) == len(self.clean_audio) == self.sample_count
@@ -72,27 +72,6 @@ class Dataset:
         noisy_test = np.load(os.path.join(directory, 'noisy_test.npy'))
         clean_test = np.load(os.path.join(directory, 'clean_test.npy'))
         return noisy_train, clean_train, noisy_val, clean_val, noisy_test, clean_test
-
-
-def plot_durations_histogram(data_points):
-    durations = [dp.duration for dp in data_points]
-    # Histogram from the minimum to the 98-th percentile, to hide the outliers.
-    percentiles = np.percentile(durations, [0, 50, 98, 100])
-    print(percentiles)  # The median and the maximum are also of interest.
-    _, ax = plt.subplots()
-    bins = round(np.sqrt([len(data_points)])[0])
-    ax.hist(durations, bins=np.linspace(percentiles[0], percentiles[2], num=bins))
-    plt.show()
-
-
-def plot_waveforms(data_points):
-    for i, dp in enumerate(data_points):
-        plt.plot(dp.noisy_audio)
-        plt.figtext(0.5, 0.01, "noisy {}".format(i))
-        plt.show()
-        plt.plot(dp.clean_audio)
-        plt.figtext(0.5, 0.01, "clean {}".format(i))
-        plt.show()
 
 
 def find_closest_speech_lengths(data_points, target_count):
@@ -138,9 +117,6 @@ if __name__ == '__main__':
     training_data = load_training_data()
     test_data = load_test_data()
     closest_data = find_closest_speech_lengths(training_data, 1000)
-    plot_durations_histogram(training_data)
-    plot_durations_histogram(closest_data)
-    plot_durations_histogram(test_data)
     for i, dp in enumerate(itertools.chain(closest_data, test_data)):
         dp.load_audio()
         percentage = round(100 * (i + 1) / (len(closest_data) + len(test_data)))
