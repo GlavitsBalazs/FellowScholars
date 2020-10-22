@@ -1,0 +1,174 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+% \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading nips_2016
+%
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{nips_2016}
+
+%\usepackage{nips_2016}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[final]{nips_2016}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+
+
+
+
+\usepackage[style=numeric,backend=bibtex,maxbibnames=99]{biblatex}
+\addbibresource{references.bib}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{amsmath,amsfonts,amsthm,bm} % Math packages
+
+\graphicspath{{img/}} %Setting the graphicspath
+
+
+
+
+\title{Removing Noise from Speech with Deep Learning}
+
+% The \author macro works with any number of authors. There are two
+% commands used to separate the names and addresses of multiple
+% authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to
+% break the lines. Using \AND forces a line break at that point. So,
+% if LaTeX puts 3 of 4 authors names on the first line, and the last
+% on the second line, try using \AND instead of \And before the third
+% author name.
+
+\author{
+	Glávits Balázs \\
+	Department of Measurement and Information Systems\\
+	Budapest University of Technology and Economics\\
+	\texttt{email@email.email} \\
+	 \And
+	Kiss Andor \\
+	Department of Automation and Applied Informatics\\
+	Budapest University of Technology and Economics\\
+	\texttt{email@email.email} \\	 
+	 \And
+	Konrád Márk \\
+	Department of Telecommunications and Media Informatics\\
+	Budapest University of Technology and Economics\\
+	\texttt{konrad0816@gmail.com} \\
+	%% \AND
+	%% Coauthor \\
+	%% Affiliation \\
+	%% Address \\
+	%% \texttt{email} \\
+	%% \And
+	%% Coauthor \\
+	%% Affiliation \\
+	%% Address \\
+	%% \texttt{email} \\
+	%% \And
+	%% Coauthor \\
+	%% Affiliation \\
+	%% Address \\
+	%% \texttt{email} \\
+}
+
+\begin{document}
+	% \nipsfinalcopy is no longer used
+	
+	\maketitle
+	
+	\begin{abstract}
+		TODO
+	\end{abstract}
+	\newpage
+	\section{Data acquisition and exploration}
+	For our training and testing data, we used a dataset called "\href{https://datashare.is.ed.ac.uk/handle/10283/2791}{Noisy speech database for training speech enhancement algorithms and TTS models}" by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs from 56 different speakers. 
+	The samples are stored in separate .wav files of varying length.  
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=.5\linewidth]{durations}
+		\caption{Duration distribution histogram of a subset of speeches}
+	\end{figure}
+
+	
+
+	\section{Data preprocessing}
+	\subsection{Data selection by duration}
+	We intend to zero pad the data in order to make the samples the same length. To reduce the number of zeroes we only use the $n$ samples that are closest to each other in duration. This way we reduce the number of training samples, but hopefully, the efficiency of our network will be much better.
+	
+	\subsection{Zero padding}
+	Our network architecture only supports samples of the same length. To fulfill this constraint, we add zeroes for the end of each recording. The number of zeroes was calculated from the difference between the longest and the current sample.
+	
+		
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_clean}
+			\caption{clean}
+			\label{fig:wave_clean}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_noisy}
+			\caption{noisy}
+			\label{fig:wave_noisy}
+		\end{subfigure}
+		\caption{An example clean-noisy pair}
+		\label{fig:test}
+		
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_clean_padded}
+			\caption{clean}
+			\label{fig:wave_clean_padded}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_noisy_padded}
+			\caption{noisy}
+			\label{fig:wave_noisy_padded}
+		\end{subfigure}
+		\caption{An example clean-noisy pair after zero padding}
+		\label{fig:test}
+	\end{figure}
+	\newpage
+	\subsection{\boldmath$\mu$-law transformation}
+	To make future computations faster we, reduce the samples to 8 bit with $\mu$-law transformation.
+	
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_clean_padded_mulaw}
+			\caption{clean}
+			\label{fig:wave_clean_padded_mulaw}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_noisy_padded_mulaw}
+			\caption{noisy}
+			\label{fig:wave_noisy_padded_mulaw}
+		\end{subfigure}
+		\caption{An example clean-noisy pair after padding and $\mu$-law transformation}
+		\label{fig:test}
+	\end{figure}
+
+
+	
+	\newpage
+	\printbibliography
+
+	
+\end{document}
