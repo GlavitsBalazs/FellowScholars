@@ -120,6 +120,26 @@ def load_test_data():
             for filename in os.listdir(clean_testset_directory)]
 
 
+def onehot_256(value):
+    return np.eye(256)[value]
+
+
+# Generate mini-batches of (noisy slice, encoded clean sample) pairs.
+def training_data_generator(data_points, slice_size, minibatch_size, slice_density=1.0, output_encoding=onehot_256):
+    minibatch = []
+    for dp in data_points:
+        dp.load_audio()
+        slice_count = int(dp.sample_count / slice_size * slice_density)
+        for _ in range(slice_count):
+            i = np.random.randint(dp.sample_count - slice_size - 1)
+            noisy_slice = dp.noisy_audio[i:i + slice_size]
+            next_clean_sample = dp.clean_audio[i + slice_size]
+            minibatch.append((noisy_slice, output_encoding(next_clean_sample)))
+            if len(minibatch) == minibatch_size:
+                yield minibatch
+                minibatch = []
+
+
 if __name__ == '__main__':
     print("Loading: 0%")
     training_data = load_training_data()
