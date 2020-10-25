@@ -10,7 +10,7 @@
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
 
-
+\usepackage{doi}
 
 
 \usepackage[style=numeric,backend=bibtex,maxbibnames=99]{biblatex}
@@ -34,23 +34,48 @@
 
 \begin{document}
 	% \nipsfinalcopy is no longer used
-	
+
 	\maketitle
 	\section{Task summary}
 	Our goal is to reduce (or in the best case, entirely remove) the noise from audio recordings containing noisy speech. The idea is to use the WaveNet\cite{wavenet}\cite{rethage2018wavenet} architecture to generate clean audio from the noisy one.
 	
 	
 	\section{Data acquisition and exploration}
-	For our training and testing data, we used a dataset called "\href{https://datashare.is.ed.ac.uk/handle/10283/2791}{Noisy speech database for training speech enhancement algorithms and TTS models}"\cite{dataset} by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs from 56 different speakers. 
-	The samples are stored in separate .wav files of varying length.  
-	
+	For our training and testing data, we used a dataset called "\href{https://datashare.is.ed.ac.uk/handle/10283/2791}{Noisy speech database for training speech enhancement algorithms and TTS models}"\cite{dataset} by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs\ref{fig:clean_noisy_noise} from 56 different speakers. 
+	The samples are stored in separate .wav files of varying length.\ref{fig:durations}  
+
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=.5\linewidth]{durations}
 		\caption{Duration distribution histogram of a subset of speeches}
+		\label{fig:durations}
 	\end{figure}
-	
-	
+
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_for_noise_clean}
+			\caption{clean}
+			\label{fig:wave_for_noise_clean}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_for_noise_noisy}
+			\caption{noisy}
+			\label{fig:wave_for_noise_noisy}
+		\end{subfigure}
+		\label{fig:clean_noisy_n}
+		
+		\begin{subfigure}{.7\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{noise}
+			\caption{noise spectogram}
+			\label{fig:noise}
+		\end{subfigure}
+		\caption{Noisy and clean samples and the spectogram of the noise from the audio in figures \ref{fig:wave_for_noise_clean} and \ref{fig:wave_for_noise_noisy}}
+		\label{fig:clean_noisy_noise}
+	\end{figure}
 	
 	\section{Data preprocessing}
 	\subsection{Data selection by duration} \label{sel_dur}
