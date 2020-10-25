@@ -9,8 +9,8 @@
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
+\usepackage{lmodern}        % required by MiKTeX
 
-\usepackage{doi}
 
 
 \usepackage[style=numeric,backend=bibtex,maxbibnames=99]{biblatex}
@@ -41,7 +41,7 @@
 	
 	
 	\section{Data acquisition and exploration}
-	For our training and testing data, we used a dataset called "\href{https://datashare.is.ed.ac.uk/handle/10283/2791}{Noisy speech database for training speech enhancement algorithms and TTS models}"\cite{dataset} by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs\ref{fig:clean_noisy_noise} from 56 different speakers. 
+	For our training and testing data, we used a dataset called Noisy speech database for training speech enhancement algorithms and TTS models\cite{dataset} by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs\ref{fig:clean_noisy_noise} from 56 different speakers. 
 	The samples are stored in separate .wav files of varying length.\ref{fig:durations}  
 
 	\begin{figure}[H]
