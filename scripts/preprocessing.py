@@ -134,7 +134,9 @@ def training_data_generator(data_points, slice_size, minibatch_size, slice_densi
             i = np.random.randint(dp.sample_count - slice_size - 1)
             noisy_slice = dp.noisy_audio[i:i + slice_size]
             next_clean_sample = dp.clean_audio[i + slice_size]
-            minibatch.append((noisy_slice, output_encoding(next_clean_sample)))
+            noisy_slice = np.expand_dims(noisy_slice, axis=2) # 3D tensors for Keras
+            next_clean_sample = output_encoding(next_clean_sample)
+            minibatch.append((noisy_slice, next_clean_sample))
             if len(minibatch) == minibatch_size:
                 yield minibatch
                 minibatch = []
