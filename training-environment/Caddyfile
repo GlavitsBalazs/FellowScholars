@@ -1,0 +1,7 @@
+{
+    email {$MY_EMAIL}
+}
+
+jupyter.{$MY_DOMAIN} {
+    reverse_proxy jupyter:8888
+}

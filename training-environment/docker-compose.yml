@@ -1,0 +1,53 @@
+version: "2.3"
+services:
+  jupyter:
+    #https://github.com/jupyter/docker-stacks
+    #image: jupyter/tensorflow-notebook
+    build: ./custom-jupyter
+    container_name: jupyter
+    hostname: jupyter
+    command: start.sh jupyter lab --LabApp.token='your-token-here' --LabApp.allow_remote_access='True' --LabApp.allow_origin='*'
+    restart: always
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0 # The zeroth device.
+    devices:
+      - "/dev/nvidia-modeset:/dev/nvidia-modeset"
+      - "/dev/nvidia-uvm:/dev/nvidia-uvm"
+      - "/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools"
+      - "/dev/nvidia0:/dev/nvidia0"
+      - "/dev/nvidiactl:/dev/nvidiactl"
+    volumes:
+      - ./notebooks:/home/jovyan
+      - ./DS_10283_2791:/home/jovyan/DS_10283_2791:ro
+    networks:
+      - caddy_network
+
+  caddy:
+    image: caddy
+    container_name: caddy
+    hostname: caddy
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - MY_DOMAIN=your-domain-here
+      - MY_EMAIL=your-email-here # for letsencrypt
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data:/data
+      - ./config:/config
+    networks:
+      - caddy_network
+
+networks:
+  caddy_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24
