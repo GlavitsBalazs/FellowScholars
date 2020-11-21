@@ -10,7 +10,7 @@ mkdir notebooks
 chown ubuntu:users notebooks
 
 apt-get update && apt-get upgrade -y
-apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common unzip
 
 # Install Nvidia driver, Docker and Nvida-Docker.
 # The required version 455.45.01 of the Nvidia driver is retrieved from the CUDA repo.
