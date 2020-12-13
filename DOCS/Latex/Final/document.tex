@@ -54,12 +54,12 @@
 	Glávits Balázs \\
 	Department of Measurement and Information Systems\\
 	Budapest University of Technology and Economics\\
-	\texttt{email@email.email} \\
+	\texttt{glavits.balazs@gmail.com} \\
 	 \And
 	Kiss Andor \\
 	Department of Automation and Applied Informatics\\
 	Budapest University of Technology and Economics\\
-	\texttt{email@email.email} \\	 
+	\texttt{kissandor4@gmail.com} \\	 
 	 \And
 	Konrád Márk \\
 	Department of Telecommunications and Media Informatics\\
@@ -92,7 +92,8 @@
 	\end{abstract}
 	\newpage
 	\section{Task summary}
-		Our goal is to reduce (or in the best case, entirely remove) the noise from audio recordings containing noisy speech. The idea is to use the WaveNet\cite{wavenet}\cite{dataset} architecture to generate clean audio from the noisy one.
+	\label{sec:summary}
+		Our goal is to reduce (or in the best case, entirely remove) the noise from audio recordings containing noisy speech. The idea is to use the WaveNet\cite{wavenet} architecture to generate clean audio from the noisy one.
 		
 	\section{Different approaches}
 	In the research phase of our task we found several different implementations of speech denoising deep neural networks. The best ones are:
@@ -102,6 +103,8 @@
 		}\cite{yu2020speech}
 		\item \textbf{WaveNet}\cite{wavenet}, which is a generative model aimed at creating raw audio waveforms. We experimented with several implementations. These can be seen in sections \ref{sec:wavenet} and \ref{sec:experiments}.
 	\end{itemize}
+
+	After considering these different solutions we decided to create an implementation based on the WaveNet architecture.
 		
 	\section{Data acquisition and exploration}
 	For our training and testing data, we used a dataset called "\href{https://datashare.is.ed.ac.uk/handle/10283/2791}{Noisy speech database for training speech enhancement algorithms and TTS models}"\cite{dataset} by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs (Figure \ref{fig:clean_noisy_noise}) from 56 different speakers. 
@@ -230,10 +233,32 @@
 	
 	
 	\subsection{Our denoising WaveNet implementation}
-	
+	\label{sec:own_wavenet}
+
 	
 	
 	\section{Experiments}
+	\begin{itemize}
+	\item \textbf{WaveNet with non-causal convolutions, \boldmath$\mu$-law transform and softmax distribution} \\
+	At first, we tried to create a denoising model with dilated non-causal convolutional layers and, $\mu$-law transformed one-hot encoded input data. After some test runs, we decided to try another approach because, with this attempt, we could not reduce the noise on the samples at all.
+	\item \textbf{WaveNet with non-causal convolutions, regression, and dense output layer} \\
+	After the first failed experiment, we tried to skip the $\mu$-law transform step and move towards a regression-based model. In this attempt, we used dilated non-causal convolutions with a dense layer for output. The resulting quality was questionable because the network removed part of the clean speech along with some of the noise.
+	\item \textbf{WaveNet with non-causal convolutions, regression, and flatten + dense output layers} \\
+	This model was the first that could provide reasonably good output. The thought process behind the addition of a flatten layer was that with it there are be more connections in the network, and the output weights will be conditioned on the output of the convolutional layers and will eventually generate clean speech. It could remove most of the noise, but the quality of the speech was much worse than the input. The other downside of this model was that the training was extremely slow because of the size of the network.
+	\item \textbf{WaveNet + auto-encoders} \\
+	We tried to stack a denoising auto-encoder on top of a non-causal WaveNet because we thought that by giving the latent space from the WaveNet's output to an auto-encoder, we could decrease the noise even more. Unfortunately, this attempt could not even replicate the input speech.
+	\item \textbf {Auto-encode surrounded with WaveNets} \\
+	Another attempt consisting of a combination of WaveNets and an auto-encoder was the idea of surrounding an auto-encoder with two identical WaveNets. We experienced a steady decrease in the model's loss, but unfortunately, we did not have the resources and time to test this model more.
+	\item \textbf{WaveNet with non-causal convolutions, regression, and extra one dimensional convolutional layers on the output} \\
+	Our final model is a WaveNet with non-causal convolutions followed by three one dimensional convolutional layers with kernel sizes three, three, one. The output is promising because it can eliminate most of the noise and, the deterioration of the sound quality is much better than any of our past attempts. With more computation time on a machine with specialized resources, there is a chance that the sound quality will improve more. For more information about this model, refer to section \ref{sec:own_wavenet}.
+	
+	\end{itemize}
+
+
+
+	
+	
+	\section{Future plans}
 	\label{sec:experiments}
 	
 	\newpage
