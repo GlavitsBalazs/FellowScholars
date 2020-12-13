@@ -236,7 +236,7 @@
 	\subsection{Our denoising WaveNet implementation}
 	\label{sec:own_wavenet}
 	To solve the problem proposed in section \ref{sec:summary}, we created our denoising WaveNet implementation. It consists of a stack of dilated non-causal convolutional layers with skip connections and three additional one-dimensional convolutional layers (Conv1D) to incorporate features extracted at every hierarchical level. The first two Conv1D layers have 2048 and 256 filters with the kernel size of three and, the last one has one filter with the size of one. This structure can be seen in figure \ref{fig:own_wavenet}.
-	 The dilated non-causal convolutional layer stack is 30 layers deep and consist of three sub stacks with the dilation from 1 to 512 in the powers of two. This way every sub-stack has a receptive field of 1024.
+	 The dilated non-causal convolutional layer stack is 30 layers deep and consists of three sub stacks with the dilation from 1 to 512 in the powers of two. This way every sub-stack has a receptive field of 1024.
 	\begin{figure}[!h]
 		\centering
 		\includegraphics[width=0.9\linewidth]{own_wavenet.png}
@@ -273,6 +273,8 @@
 		\caption{An example noise reduction}
 		\label{fig:test}
 	\end{figure}
+
+	While the output is not perfect, it can reduce the noise of the input track significantly.
 
 
 	\section{Experiments}
