@@ -234,7 +234,7 @@
 	
 	\subsection{Our denoising WaveNet implementation}
 	\label{sec:own_wavenet}
-	To solve the problem proposed in section \ref{sec:summary}, we created our denoising WaveNet implementation. It consists of a stack of dilated non-causal convolutional layers with skip connections and three additional one-dimensional convolutional layers (Conv1D) to incorporate features extracted at every hierarchical level. The first two Conv1D layers have 2048 and 256 kernels with the kernel size of three and, the last one has one filter with the size of one. This structure can be seen in figure \ref{fig:own_wavenet}.
+	To solve the problem proposed in section \ref{sec:summary}, we created our denoising WaveNet implementation. It consists of a stack of dilated non-causal convolutional layers with skip connections and three additional one-dimensional convolutional layers (Conv1D) to incorporate features extracted at every hierarchical level. The first two Conv1D layers have 2048 and 256 filters with the filter size of three and, the last one has one filter with the size of one. This structure can be seen in figure \ref{fig:own_wavenet}.
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=.9\linewidth]{own_wavenet.png}
@@ -243,17 +243,24 @@
 	\end{figure}
 	
 	
+	
 		\begin{figure}[H]
 		\centering
 		\begin{subfigure}{.5\textwidth}
 			\centering
 			\includegraphics[width=.8\linewidth]{test_noisy}
-			\caption{Input}
+			\caption{Noisy}
 			\label{fig:test_noisy}
 		\end{subfigure}%
 		\begin{subfigure}{.5\textwidth}
 			\centering
-			\includegraphics[width=.8\linewidth]{test_clean}
+			\includegraphics[width=.8\linewidth]{test_clean_orig}
+			\caption{Clean}
+			\label{fig:test_clean_orig}
+		\end{subfigure}
+		\begin{subfigure}{1\textwidth}
+			\centering
+			\includegraphics[width=.7\linewidth]{test_clean}
 			\caption{Output}
 			\label{fig:test_clean}
 		\end{subfigure}
@@ -275,7 +282,7 @@
 	\item \textbf {Auto-encoder surrounded with WaveNets} \\
 	Another attempt consisting of a combination of WaveNets and an auto-encoder was the idea of surrounding an auto-encoder with two identical WaveNets. We experienced a steady decrease in the model's loss, but unfortunately, we did not have the resources and time to test this model more.
 	\item \textbf{WaveNet with non-causal convolutions, regression, and extra one dimensional convolutional layers on the output} \\
-	Our final model is a WaveNet with non-causal convolutions followed by three one dimensional convolutional layers with kernel sizes three, three, one. The output is promising because it can eliminate most of the noise and, the deterioration of the sound quality is much better than any of our past attempts. With more computation time on a machine with specialized resources, there is a chance that the sound quality will improve more. For more information about this model, refer to section \ref{sec:own_wavenet}.
+	Our final model is a WaveNet with non-causal convolutions followed by three one dimensional convolutional layers with filter sizes three, three, one. The output is promising because it can eliminate most of the noise and, the deterioration of the sound quality is much better than any of our past attempts. With more computation time on a machine with specialized resources, there is a chance that the sound quality will improve more. For more information about this model, refer to section \ref{sec:own_wavenet}.
 	
 	\end{itemize}
 
