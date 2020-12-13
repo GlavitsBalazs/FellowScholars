@@ -99,6 +99,7 @@
 	\section{Different approaches}
 	In the research phase of our task we found several different implementations of speech denoising deep neural networks. The best ones are:
 	\begin{itemize}
+		\item \textbf {Denoising auto-encoder}\cite{denoising_ae}\cite{denoising_ae2}
 		\item \textbf{Speech Enhancement Generative Adversarial Network (SEGAN)}\cite{pascual2017segan}, which is a GAN based approach where the generator receives the noisy data with a latent representation and the discriminator is just a binary classifier.
 		\item \textbf{Speech Enhancement based on Denoising Autoencoder with Multi-branched Encoders
 		}\cite{yu2020speech}
@@ -208,8 +209,6 @@
 		\label{fig:wavenet}
 	\end{figure}
 	It must be noted that this model is primarily designed to be used in Text-to-Speech (TTS) applications.
-	
-	
 	
 	\subsection{WaveNet for speech denoising}
 	While the WaveNet architecture proposed by DeepMind is a state of the art implementation for TTS applications its current form is not suitable for speech denoising.
