@@ -88,7 +88,8 @@
 	\maketitle
 	
 	\begin{abstract}
-		TODO
+	In this paper we will present some already existing state of the art models for speech denoising and a detailed description of our own solution to the problem.  After that we discuss a few alternative non-working solutions that we tried out, and some future plans to improve our proposed model.
+
 	\end{abstract}
 	\newpage
 	\section{Task summary}
@@ -210,7 +211,7 @@
 	
 	
 	
-	\subsection{WaveNet for noise removing}
+	\subsection{WaveNet for speech denoising}
 	While the WaveNet architecture proposed by DeepMind is a state of the art implementation for TTS applications its current form is not suitable for speech denoising.
 	Rethage et al. \cite{rethage2018wavenet} proposed a WaveNet adaptation for the purpose of removing noise from speech samples (Figure \ref{fig:wavenet2}).
 	
@@ -273,6 +274,7 @@
 	\end{figure}
 
 	\section{Experiments}
+	\label{sec:experiments}
 	\begin{itemize}
 	\item \textbf{WaveNet with non-causal convolutions, \boldmath$\mu$-law transform and softmax distribution} \\
 	At first, we tried to create a denoising model with dilated non-causal convolutional layers and, $\mu$-law transformed one-hot encoded input data. After some test runs, we decided to try another approach because, with this attempt, we could not reduce the noise on the samples at all.
@@ -294,7 +296,9 @@
 		
 	
 	\section{Future plans}
-	\label{sec:experiments}
+	Since hyperparameter optimization is usually a never-ending task, obviously one of our plans for the future is to optimize our best-performing model, to see if we can denoise speech even better, and potentially to reduce the loss of sound quality when denoising.
+	We tried out some other architectures as well, which have shown promise, especially the auto-encoder surrounded with wavenets. In the future, if we have more time and computing power in our hands, we can train that model for a long time, if it shows some better results, we can also start our never-ending journey of optimizing the hyperparameters of it as well.
+	
 	
 	\newpage
 	\printbibliography
