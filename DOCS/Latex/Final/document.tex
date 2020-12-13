@@ -235,20 +235,21 @@
 	\subsection{Our denoising WaveNet implementation}
 	\label{sec:own_wavenet}
 	To solve the problem proposed in section \ref{sec:summary}, we created our denoising WaveNet implementation. It consists of a stack of dilated non-causal convolutional layers with skip connections and three additional one-dimensional convolutional layers (Conv1D) to incorporate features extracted at every hierarchical level. The first two Conv1D layers have 2048 and 256 filters with the kernel size of three and, the last one has one filter with the size of one. This structure can be seen in figure \ref{fig:own_wavenet}.
-	\begin{figure}[htbp]
+	 The dilated non-causal convolutional layer stack is 30 layers deep and consist of three sub stacks with the dilation from 1 to 512 in the powers of two. This way every sub-stack has a receptive field of 1024.
+	\begin{figure}[!h]
 		\centering
-		\includegraphics[width=1\linewidth]{own_wavenet.png}
+		\includegraphics[width=0.9\linewidth]{own_wavenet.png}
 		\caption{Overview of the denoising WaveNet architecture}
 		\label{fig:own_wavenet}
 	\end{figure}
 	The skip connections (Figure \ref{fig:residual}) use the ReLU activation function. We tried out the HeNormal kernel initialization proposed by He et al. \cite{he2015delving} but, it could not provide any improvement so, we stayed with the previously used Glorot uniform initialization.
-	We tried to use different optimizers like Adam and SGD. For a smaller volume of data the Adam optimizer, for larger the SGD optimizer was the better choice. We also tried the AdamW\cite{adamw} optimizer, but it could not improve the output. 
+	We tried to use different optimizers like Adam and SGD. For a smaller volume of data the Adam optimizer, for larger the SGD optimizer was the better choice. We also tried the AdamW\cite{adamw} optimizer, but it only made the output worse. Our best performing model was trained on a relatively small dataset with the Adam optimizer.
 
 	While training the network we reduced the learning rate if there was no improvements for several epochs. We saved the model after every epoch because in this case validation loss is not necessarily the best metric to track improvement and we did not want to lose a potentially good model.
 
-	The model's input is a batch of a 2048 float long (the sample rate of the data is 16kHz so, the input is 128 milliseconds long) noisy slices from the dataset provided by a data generator, and the output should be the same 2048 long sample without noise. A zoomed-in test run can be seen in Figure \ref{fig:test}.
+	The model's input is a batch of a 2048 float long (the sample rate of the data is 16kHz so, the input is 128 milliseconds long) noisy slices from the dataset provided by a data generator, and the output should be the same 2048 long sample without noise. A zoomed-in test run can be seen in Figure \ref{fig:test}. 
 	
-	\begin{figure}[!h]
+	\begin{figure}[htbp]
 		\centering
 		\begin{subfigure}{.5\textwidth}
 			\centering
@@ -271,6 +272,7 @@
 		\caption{An example noise reduction}
 		\label{fig:test}
 	\end{figure}
+
 
 	\section{Experiments}
 	\label{sec:experiments}
