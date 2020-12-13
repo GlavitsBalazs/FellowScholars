@@ -234,7 +234,7 @@
 	
 	\subsection{Our denoising WaveNet implementation}
 	\label{sec:own_wavenet}
-	To solve the problem proposed in section \ref{sec:summary}, we created our denoising WaveNet implementation. It consists of a stack of dilated non-causal convolutional layers with skip connections and three additional one-dimensional convolutional layers (Conv1D) to incorporate features extracted at every hierarchical level. The first two Conv1D layers have 2048 and 256 filters with the filter size of three and, the last one has one filter with the size of one. This structure can be seen in figure \ref{fig:own_wavenet}.
+	To solve the problem proposed in section \ref{sec:summary}, we created our denoising WaveNet implementation. It consists of a stack of dilated non-causal convolutional layers with skip connections and three additional one-dimensional convolutional layers (Conv1D) to incorporate features extracted at every hierarchical level. The first two Conv1D layers have 2048 and 256 filters with the kernel size of three and, the last one has one filter with the size of one. This structure can be seen in figure \ref{fig:own_wavenet}.
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=1\linewidth]{own_wavenet.png}
@@ -242,7 +242,7 @@
 		\label{fig:own_wavenet}
 	\end{figure}
 	The skip connections (Figure \ref{fig:residual}) use the ReLU activation function. We tried out the HeNormal kernel initialization proposed by He et al. \cite{he2015delving} but, it could not provide any improvement so, we stayed with the previously used Glorot uniform initialization.
-	We tried to use different optimizers like Adam and SGD. For a smaller volume of data the Adam optimizer, for larger the SGD optimizer was the better choice.
+	We tried to use different optimizers like Adam and SGD. For a smaller volume of data the Adam optimizer, for larger the SGD optimizer was the better choice. We also tried the AdamW\cite{adamw} optimizer, but it could not improve the output. 
 
 	While training the network we reduced the learning rate if there was no improvements for several epochs. We saved the model after every epoch because in this case validation loss is not necessarily the best metric to track improvement and we did not want to lose a potentially good model.
 
@@ -290,8 +290,8 @@
 	\end{itemize}
 
 
-
 	
+		
 	
 	\section{Future plans}
 	\label{sec:experiments}
