@@ -234,7 +234,32 @@
 	
 	\subsection{Our denoising WaveNet implementation}
 	\label{sec:own_wavenet}
-
+	To solve the problem proposed in section \ref{sec:summary}, we created our denoising WaveNet implementation. It consists of a stack of dilated non-causal convolutional layers with skip connections and three additional one-dimensional convolutional layers (Conv1D) to incorporate features extracted at every hierarchical level. The first two Conv1D layers have 2048 and 256 kernels with the kernel size of three and, the last one has one filter with the size of one. This structure can be seen in figure \ref{fig:own_wavenet}.
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=.9\linewidth]{own_wavenet.png}
+		\caption{Overview of the denoising WaveNet architecture}
+		\label{fig:own_wavenet}
+	\end{figure}
+	
+	
+		\begin{figure}[H]
+		\centering
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{test_noisy}
+			\caption{Input}
+			\label{fig:test_noisy}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{test_clean}
+			\caption{Output}
+			\label{fig:test_clean}
+		\end{subfigure}
+		\caption{An example noise reduction}
+		\label{fig:test}
+	\end{figure}
 	
 	
 	\section{Experiments}
@@ -247,7 +272,7 @@
 	This model was the first that could provide reasonably good output. The thought process behind the addition of a flatten layer was that with it there are be more connections in the network, and the output weights will be conditioned on the output of the convolutional layers and will eventually generate clean speech. It could remove most of the noise, but the quality of the speech was much worse than the input. The other downside of this model was that the training was extremely slow because of the size of the network.
 	\item \textbf{WaveNet + auto-encoders} \\
 	We tried to stack a denoising auto-encoder on top of a non-causal WaveNet because we thought that by giving the latent space from the WaveNet's output to an auto-encoder, we could decrease the noise even more. Unfortunately, this attempt could not even replicate the input speech.
-	\item \textbf {Auto-encode surrounded with WaveNets} \\
+	\item \textbf {Auto-encoder surrounded with WaveNets} \\
 	Another attempt consisting of a combination of WaveNets and an auto-encoder was the idea of surrounding an auto-encoder with two identical WaveNets. We experienced a steady decrease in the model's loss, but unfortunately, we did not have the resources and time to test this model more.
 	\item \textbf{WaveNet with non-causal convolutions, regression, and extra one dimensional convolutional layers on the output} \\
 	Our final model is a WaveNet with non-causal convolutions followed by three one dimensional convolutional layers with kernel sizes three, three, one. The output is promising because it can eliminate most of the noise and, the deterioration of the sound quality is much better than any of our past attempts. With more computation time on a machine with specialized resources, there is a chance that the sound quality will improve more. For more information about this model, refer to section \ref{sec:own_wavenet}.
