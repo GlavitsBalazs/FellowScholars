@@ -91,61 +91,50 @@
 		TODO
 	\end{abstract}
 	\newpage
+	\section{Task summary}
+		Our goal is to reduce (or in the best case, entirely remove) the noise from audio recordings containing noisy speech. The idea is to use the WaveNet\cite{wavenet}\cite{dataset} architecture to generate clean audio from the noisy one.
 	\section{Data acquisition and exploration}
-	For our training and testing data, we used a dataset called "\href{https://datashare.is.ed.ac.uk/handle/10283/2791}{Noisy speech database for training speech enhancement algorithms and TTS models}" by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs from 56 different speakers. 
-	The samples are stored in separate .wav files of varying length.  
+	For our training and testing data, we used a dataset called "\href{https://datashare.is.ed.ac.uk/handle/10283/2791}{Noisy speech database for training speech enhancement algorithms and TTS models}"\cite{dataset} by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs (figure \ref{fig:clean_noisy_noise}) from 56 different speakers. 
+	The samples are stored in separate .wav files of varying length (figure \ref{fig:dur}).  
 
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=.5\linewidth]{durations}
 		\caption{Duration distribution histogram of a subset of speeches}
+		\label{fig:dur}
+	\end{figure}
+
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_for_noise_clean}
+			\caption{clean}
+			\label{fig:wave_for_noise_clean}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{wave_for_noise_noisy}
+			\caption{noisy}
+			\label{fig:wave_for_noise_noisy}
+		\end{subfigure}
+		\label{fig:clean_noisy_n}
+		
+		\begin{subfigure}{.7\textwidth}
+			\centering
+			\includegraphics[width=.8\linewidth]{noise}
+			\caption{noise spectogram}
+			\label{fig:noise}
+		\end{subfigure}
+		\caption{Noisy and clean samples and the spectogram of the noise from the audio in figures \ref{fig:wave_for_noise_clean} and \ref{fig:wave_for_noise_noisy}}
+		\label{fig:clean_noisy_noise}
 	\end{figure}
 
 	
 
 	\section{Data preprocessing}
-	\subsection{Data selection by duration}
-	We intend to zero pad the data in order to make the samples the same length. To reduce the number of zeroes we only use the $n$ samples that are closest to each other in duration. This way we reduce the number of training samples, but hopefully, the efficiency of our network will be much better.
-	
-	\subsection{Zero padding}
-	Our network architecture only supports samples of the same length. To fulfill this constraint, we add zeroes for the end of each recording. The number of zeroes was calculated from the difference between the longest and the current sample.
-	
-		
-	\begin{figure}[H]
-		\centering
-		\begin{subfigure}{.5\textwidth}
-			\centering
-			\includegraphics[width=.8\linewidth]{wave_clean}
-			\caption{clean}
-			\label{fig:wave_clean}
-		\end{subfigure}%
-		\begin{subfigure}{.5\textwidth}
-			\centering
-			\includegraphics[width=.8\linewidth]{wave_noisy}
-			\caption{noisy}
-			\label{fig:wave_noisy}
-		\end{subfigure}
-		\caption{An example clean-noisy pair}
-		\label{fig:test}
-		
-		\begin{subfigure}{.5\textwidth}
-			\centering
-			\includegraphics[width=.8\linewidth]{wave_clean_padded}
-			\caption{clean}
-			\label{fig:wave_clean_padded}
-		\end{subfigure}%
-		\begin{subfigure}{.5\textwidth}
-			\centering
-			\includegraphics[width=.8\linewidth]{wave_noisy_padded}
-			\caption{noisy}
-			\label{fig:wave_noisy_padded}
-		\end{subfigure}
-		\caption{An example clean-noisy pair after zero padding}
-		\label{fig:test}
-	\end{figure}
-	\newpage
-	\subsection{\boldmath$\mu$-law transformation}
-	To make future computations faster we, reduce the samples to 8 bit with $\mu$-law transformation.
+
+	Our first approach was to select the $n$ closest audio samples and zero-pad them to be the same duration, then reduce the samples to 8 bit with $\mu$-law transformation (figure \ref{fig:clean_noisy_padded_mulaw}).
 	
 	\begin{figure}[H]
 		\centering
@@ -162,13 +151,47 @@
 			\label{fig:wave_noisy_padded_mulaw}
 		\end{subfigure}
 		\caption{An example clean-noisy pair after padding and $\mu$-law transformation}
-		\label{fig:test}
+		\label{fig:clean_noisy_padded_mulaw}
 	\end{figure}
+	
+	With this implementation we ran into the problem of limited hardware resources so, we had to come up with a less resource-intensive preprocessing pipeline.
+	
+	Our solution was to load the raw data, normalize it between -1 and 1 and downsample it to 16kHz. After these preprocessing steps, we feed the audio to the model with a data generator which can generate batches of smaller same sized pieces of data.
+	With this approach, we eliminated the memory problem but sacrificed some of the continuity in our speech samples. The other upside of this solution is that we don't have to feed the meaningless data to the model in the form of zeroes.
+	
+	The original implementation of the WaveNet architecture used one-hot encoded $\mu$-law transformed data, but after experimenting with these, we could not generate audio with acceptable quality.
 
 
+	\section{The WaveNet architecture}
+	For our network architecture, we choose to use a modified version of the WaveNet\cite{wavenet} architecture developed by DeepMind.
+
+	WaveNet is a deep neural network capable of generating raw audio waveforms. This can be achieved with the use of a dilated causal convolutional layers. Causal means that the network is only conditioned on past and current inputs. With this approach, we can make sure that the ordering of the data is not violated. With dilation, we can achieve a large receptive field with the preservation of the input resolution. The structure of a stack created with these kinds of layers can be seen in figure \ref{fig:dccs}.
+	
+		
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=.8\linewidth]{dccs.png}
+		\caption{A dilated causal convolutional layer stack}
+		\label{fig:dccs}
+	\end{figure}
+	
+	The model uses residual blocks and skip connections to speed up the convergence and enable the use of deeper networks.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=.8\linewidth]{residual.png}
+		\caption{Residual blocks in WaveNet}
+		\label{fig:residual}
+	\end{figure}
+	
+	\subsection{WaveNet for noise removing}
+	
+	\subsection{Our denoising WaveNet implementation}
+	
 	
 	\newpage
 	\printbibliography
 
-	
+
+
 \end{document}
