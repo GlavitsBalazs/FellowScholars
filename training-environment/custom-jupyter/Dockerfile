@@ -9,7 +9,8 @@ RUN install-cuda.sh
 
 USER $NB_UID
 
+# Install tensorflow and librosa.
 RUN pip install --quiet --no-cache-dir \
-    'tensorflow==2.4.0rc2' && \
+    'tensorflow==2.4.0rc2' 'librosa' && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"

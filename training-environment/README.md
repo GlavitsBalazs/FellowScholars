@@ -1,6 +1,6 @@
 # Training environment
 
-We set up (Jupyter)[https://github.com/jupyter/docker-stacks/tree/master/scipy-notebook] running on a VPS equipped with Nvidia GPUs (rented from Google Cloud) as our work environment.
+We set up [Jupyter](https://github.com/jupyter/docker-stacks/tree/master/scipy-notebook) running on a VPS equipped with Nvidia GPUs (rented from Google Cloud) as our work environment.
 
 To replicate, follow these steps on a fresh install of Ubuntu 20.04 Minimal.
 1. Ensure that the machine is accesible from the internet. Open port 80 and 443 on your firewall. Install a `jupyter.@` DNS record.
