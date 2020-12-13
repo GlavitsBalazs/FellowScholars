@@ -93,9 +93,19 @@
 	\newpage
 	\section{Task summary}
 		Our goal is to reduce (or in the best case, entirely remove) the noise from audio recordings containing noisy speech. The idea is to use the WaveNet\cite{wavenet}\cite{dataset} architecture to generate clean audio from the noisy one.
+		
+	\section{Different approaches}
+	In the research phase of our task we found several different implementations of speech denoising deep neural networks. The best ones are:
+	\begin{itemize}
+		\item \textbf{Speech Enhancement Generative Adversarial Network (SEGAN)}\cite{pascual2017segan}, which is a GAN based approach where the generator receives the noisy data with a latent representation and the discriminator is just a binary classifier.
+		\item \textbf{Speech Enhancement based on Denoising Autoencoder with Multi-branched Encoders
+		}\cite{yu2020speech}
+		\item \textbf{WaveNet}\cite{wavenet}, which is a generative model aimed at creating raw audio waveforms. We experimented with several implementations. These can be seen in sections \ref{sec:wavenet} and \ref{sec:experiments}.
+	\end{itemize}
+		
 	\section{Data acquisition and exploration}
-	For our training and testing data, we used a dataset called "\href{https://datashare.is.ed.ac.uk/handle/10283/2791}{Noisy speech database for training speech enhancement algorithms and TTS models}"\cite{dataset} by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs (figure \ref{fig:clean_noisy_noise}) from 56 different speakers. 
-	The samples are stored in separate .wav files of varying length (figure \ref{fig:dur}).  
+	For our training and testing data, we used a dataset called "\href{https://datashare.is.ed.ac.uk/handle/10283/2791}{Noisy speech database for training speech enhancement algorithms and TTS models}"\cite{dataset} by the University of Edinburgh. It consists of $\sim$23000 clean-noisy pairs (Figure \ref{fig:clean_noisy_noise}) from 56 different speakers. 
+	The samples are stored in separate .wav files of varying length (Figure \ref{fig:dur}).  
 
 	\begin{figure}[H]
 		\centering
@@ -163,9 +173,10 @@
 
 
 	\section{The WaveNet architecture}
+	\label{sec:wavenet}
 	For our network architecture, we choose to use a modified version of the WaveNet\cite{wavenet} architecture developed by DeepMind.
 
-	WaveNet is a deep neural network capable of generating raw audio waveforms. This can be achieved with the use of a dilated causal convolutional layers. Causal means that the network is only conditioned on past and current inputs. With this approach, we can make sure that the ordering of the data is not violated. With dilation, we can achieve a large receptive field with the preservation of the input resolution. The structure of a stack created with these kinds of layers can be seen in figure \ref{fig:dccs}.
+	WaveNet is a deep neural network capable of generating raw audio waveforms. This can be achieved with the use of a dilated causal convolutional layers. Causal means that the network is only conditioned on past and current inputs. With this approach, we can make sure that the ordering of the data is not violated. With dilation, we can achieve a large receptive field with the preservation of the input resolution. The structure of a stack created with these kinds of layers can be seen in Figure \ref{fig:dccs}.
 	
 		
 	\begin{figure}[H]
@@ -183,11 +194,47 @@
 		\caption{Residual blocks in WaveNet}
 		\label{fig:residual}
 	\end{figure}
+
+	To avoid making assumptions of the output shape the model uses discrete softmax distribution. The overview of the architecture can be seen in Figure \ref{fig:wavenet}.
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=.8\linewidth]{wavenet_overview.png}
+		\caption{A simplified overview of the WaveNet architecture}
+		\label{fig:wavenet}
+	\end{figure}
+	It must be noted that this model is primarily designed to be used in Text-to-Speech (TTS) applications.
+	
+	
 	
 	\subsection{WaveNet for noise removing}
+	While the WaveNet architecture proposed by DeepMind is a state of the art implementation for TTS applications its current form is not suitable for speech denoising.
+	Rethage et al. \cite{rethage2018wavenet} proposed a WaveNet adaptation for the purpose of removing noise from speech samples (Figure \ref{fig:wavenet2}).
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=.8\linewidth]{wavenet_overview2.png}
+		\caption{A simplified overview of the WaveNet speech denoising architecture}
+		\label{fig:wavenet2}
+	\end{figure}
+	
+	The original WaveNet architecture uses causal convolutional layers for keeping the ordering of the data, but in speech denoising a substantially more accurate prediction can be achieved with non-causal convolutions. This change essentially doubled the context available to the model (Figure \ref{fig:dnccs}).
+	
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=.9\linewidth]{dnccs.png}
+		\caption{A dilated non-causal convolutional layer stack}
+		\label{fig:dnccs}
+	\end{figure}
+	
 	
 	\subsection{Our denoising WaveNet implementation}
 	
+	
+	
+	\section{Experiments}
+	\label{sec:experiments}
 	
 	\newpage
 	\printbibliography
