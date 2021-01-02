@@ -51,29 +51,30 @@ Data augmentation: Overlapping slices
 
 Model is a black box now, it will be elaborated later.  
 
+# Original wavenet
 
-# Tortor posuere ac ut consequat:
+![Wavenet](img/wavenet.png){ width=80% }
 
-1. Eu augue ut lectus arcu bibendum at varius.
-2. Nisl suscipit adipiscing bibendum est ultricies integer quis.
-3. Facilisi etiam dignissim diam quis enim lobortis scelerisque.
-4. **Facilisis mauris sit amet massa vitae tortor condimentum.**
+# Modified wavenet
 
-# Maths
+![Modified wavenet](img/wavenet_dense.png){ width=80% }
 
-Inline $sin^{2}(x)$ maths.  
-Display maths:  
-$$ \frac{\frac{1}{x}+\frac{1}{y}}{y-z} $$
+# Autoencoder
 
-# Wavenet
+![Wavenet based autoencoder](img/our_network.png){ width=80% }
 
-![Wavenet](img/own_wavenet.png){ width=80% }
+# Training
 
+- Clean & Noisy slice generator
+- MAE loss
+- SGD optimizer
+- ReduceLROnPlateau
 
+# Demo
 
 # Thank you for your attention
 
 Sources:
  
-- Dario Rethage, Jordi Pons, and Xavier Serra. “A Wavenet for Speech Denoising”. In: (2018). [arXiv:1706.07162](https://arxiv.org/abs/1706.07162)
+- Dario Rethage, Jordi Pons, and Xavier Serra. “A Wavenet for Speech Denoising”. In: (2018) [arXiv:1706.07162](https://arxiv.org/abs/1706.07162)
 - ...
