@@ -51,20 +51,37 @@ Data augmentation: Overlapping slices
 
 Model is a black box now, it will be elaborated later.  
 
-# Original wavenet
+# Original WaveNet
 
-![Wavenet](img/wavenet.png){ width=80% }
+![WaveNet](img/wavenet.png){ width=80% }  
+
+Causal convolutions, mu-law transform and softmax distribution.
 
 # Modified wavenet
 
-![Modified wavenet](img/wavenet_dense.png){ width=80% }
+![Modified WaveNet](img/wavenet_dense.png){ width=80% }  
 
-# Autoencoder
+Non-causal convolutions, and dense output layer.
 
-![Wavenet based autoencoder](img/our_network.png){ width=80% }
+# Regression with dense layer
+
+![Regression with dense layer](img/regression_dense.png){ width=80% }  
+
+WaveNet with non-causal convolutions, regression, and flatten + dense output layers
+
+# WaveNet based autoencoder
+
+![Wavenet based autoencoder](img/autoencoder.png){ width=80% } 
+
+# Regression with convolutional layers
+ 
+![Wavenet based autoencoder](img/our_network.png){ width=80% }  
+
+WaveNet with non-causal convolutions, regression, and extra one dimensional convolutional layers on the output.
 
 # Training
 
+- Google Cloud Platform
 - Clean & Noisy slice generator
 - MAE loss
 - SGD optimizer
@@ -76,5 +93,6 @@ Model is a black box now, it will be elaborated later.
 
 Sources:
  
+- Aaron van den Oord, Sander Dieleman, Heiga Zen, Karen Simonyan, Oriol Vinyals, AlexGraves, Nal Kalchbrenner, Andrew Senior, and Koray Kavukcuoglu. “WaveNet: A GenerativeModel for Raw Audio”. In: (2016) [arXiv:1609.03499](https://arxiv.org/abs/1609.03499)
 - Dario Rethage, Jordi Pons, and Xavier Serra. “A Wavenet for Speech Denoising”. In: (2018) [arXiv:1706.07162](https://arxiv.org/abs/1706.07162)
-- ...
+
