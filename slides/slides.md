@@ -143,7 +143,16 @@ Success, but...
 # Thank you for your attention
 
 Sources:
- 
-- Aaron van den Oord, Sander Dieleman, Heiga Zen, Karen Simonyan, Oriol Vinyals, AlexGraves, Nal Kalchbrenner, Andrew Senior, and Koray Kavukcuoglu. “WaveNet: A GenerativeModel for Raw Audio”. In: (2016) [arXiv:1609.03499](https://arxiv.org/abs/1609.03499)
-- Dario Rethage, Jordi Pons, and Xavier Serra. “A Wavenet for Speech Denoising”. In: (2018) [arXiv:1706.07162](https://arxiv.org/abs/1706.07162)
+
+\small {
+\begin{itemize}
+\item Aaron van den Oord, Sander Dieleman, Heiga Zen, Karen Simonyan, Oriol Vinyals, Alex Graves, Nal Kalchbrenner, Andrew Senior, and Koray Kavukcuoglu. “WaveNet: A GenerativeModel for Raw Audio”. In: (2016) \href{https://arxiv.org/abs/1609.03499}{[arXiv:1609.03499]}
+\item Dario Rethage, Jordi Pons, and Xavier Serra. “A Wavenet for Speech Denoising”. In: (2018) \href{https://arxiv.org/abs/1706.07162}{[arXiv:1706.07162]}
+\item Xugang lu, Yu Tsao, Shigeki Matsuda, and C. Hori. \href{https://www.isca-speech.org/archive/archive_papers/interspeech_2014/i14_0885.pdf}{"Ensemble modeling of denoising autoencoder for speech spectrum restoration"}. In: (2014)
+\item Santiago Pascual, Antonio Bonafonte, and Joan Serrà. “SEGAN: Speech Enhancement Generative Adversarial Network”. In: (2017). \href{https://arxiv.org/pdf/1703.09452.pdf}{[arXiv: 1703.09452]}
+\item Cheng Yu, Ryandhimas E. Zezario, Jonathan Sherman, Yi-Yen Hsieh, Xugang Lu, Hsin-Min Wang, and Yu Tsao. “Speech Enhancement based on Denoising Autoencoder with Multibranched Encoders”. In: (2020). \href{https://arxiv.org/pdf/2001.01538.pdf}{[arXiv: 2001.01538]}
+\end{itemize}
+}
+
+
 
