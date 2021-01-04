@@ -1,10 +1,16 @@
 ---
 title: Removing Noise from Speech with Deep Learning
+short-title: test
 theme: CambridgeUS
 author: |
   Andor Kiss  
   Balázs Glávits  
   Márk Konrád  
+header-includes:
+  - \AtBeginDocument{\title[Removing Noise from Speech with DL]{Removing Noise from Speech with Deep Learning}}
+
+  
+
 ---
 
 # Introduction
@@ -32,6 +38,39 @@ Else it is cancelled.
 
 Not flexible enough.  
 Deep learning could do a better job.
+
+# Existing implementations
+ - Autoencoder based
+ - GAN based
+ - WaveNet based
+
+# Autoencoder based
+ - Denoising Autoencoder
+ 
+ ![DAE](img/dae.png){ width=60% }
+ 
+# Autoencoder based
+ - Denoising Autoencoder with Multi-branched Encoders
+ 
+  ![DAEME](img/daeme.png){ width=60% }
+
+# GAN based
+ - Speech Enhancement Generative Adversarial Network
+ 
+  ![SEGAN](img/segan.png){ width=60% }
+
+# WaveNet based
+ - Wavenet for Speech Denoising
+ 
+  ![Speech denoising WaveNet](img/sd_wavenet.png){ width=60% }
+
+# Training and testing data
+ - ~23000 samples
+ - 56 different voices and noise conditions
+
+  ![Noisy data](img/wave_noisy.png){ width=40% }
+ 
+  ![Clean data](img/wave_clean.png){ width=40% }
 
 # Data pipeline
 
