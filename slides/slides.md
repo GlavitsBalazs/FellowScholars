@@ -17,7 +17,7 @@ header-includes:
 
 Our task was to reduce noise from speech using deep learning.  
 
-The goal was to preserve sound quality as much as we can, while reducing the noise.  
+Preserve sound quality.
 
 # Motivation
 
@@ -86,7 +86,7 @@ Data augmentation: Overlapping slices
 
 # Full data pipeline
 
-![Inference preprocessing](img/Preprocess2.JPG){ width=60% }  
+![Full pipeline](img/Preprocess2.JPG){ width=60% }  
 
 Model is a black box now, it will be elaborated later.  
 
@@ -127,6 +127,12 @@ WaveNet with non-causal convolutions, regression, and extra one dimensional conv
 - ReduceLROnPlateau
 
 # Demo
+
+Separately, in an .ipynb
+
+# Summary
+
+Success, but...
 
 # Thank you for your attention
 
