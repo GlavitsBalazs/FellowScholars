@@ -13,3 +13,6 @@ Install `requirements.txt` and use `denoise.py` with `models\model.hdf5`.
 
 # Training
 Please see `training-environment\README.md` and `model_training.ipynb`.
+
+# Presentation
+[On YouTube (Hungarian language)](https://www.youtube.com/watch?v=sBLfbP0_Zq8)
