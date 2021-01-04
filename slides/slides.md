@@ -112,11 +112,17 @@ WaveNet with non-causal convolutions, regression, and flatten + dense output lay
 
 ![Wavenet based autoencoder](img/autoencoder.png){ width=80% } 
 
+# Autoencoder surrounded by WaveNets
+
+![WaveNet + autoencoder](img/wavenet_ae.png){ width=100% } 
+
 # Regression with convolutional layers
  
-![Wavenet based autoencoder](img/our_network.png){ width=80% }  
+![WaveNet + regression](img/our_network.png){ width=80% }  
 
 WaveNet with non-causal convolutions, regression, and extra one dimensional convolutional layers on the output.
+
+
 
 # Training
 
